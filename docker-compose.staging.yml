@@ -1,0 +1,26 @@
+services:
+  nextjs-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    container_name: fyp-next-staging
+    ports:
+      - "4000:3000"  # Different port to run alongside dev
+    environment:
+      - NODE_ENV=staging
+      - NEXT_PUBLIC_API_URL=https://staging-api.yourdomain.com
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env.staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
